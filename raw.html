@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cytoscape with Dagre Layout</title>
+    <!-- Load Cytoscape.js -->
+    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+    <!-- Load Dagre library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+    <!-- Load Cytoscape Dagre layout extension -->
+    <script src="https://unpkg.com/cytoscape-dagre"></script>
+</head>
+<body>
+    <div id="cy" style="width: 800px; height: 600px;"></div>
+    <script>
+        // Vanilla JS code to initialize Cytoscape with Dagre layout
+        document.addEventListener('DOMContentLoaded', function() {
+            var cy = cytoscape({
+                container: document.getElementById('cy'),
+                
+                elements: [
+                    // list of graph elements to start with
+                    { data: { id: 'a' } },
+                    { data: { id: 'b' } },
+                    { data: { id: 'c' } },
+                    { data: { id: 'd' } },
+                    { data: { id: 'e' } },
+                    { data: { id: 'ab', source: 'a', target: 'b' } },
+                    // etc...
+                ],
+
+                style: [ // the stylesheet for the graph
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': '#666',
+                            'label': 'data(id)'
+                        }
+                    },
+
+                    {
+                        selector: 'edge',
+                        style: {
+                            'width': 3,
+                            'line-color': '#ccc',
+                            'target-arrow-color': '#ccc',
+                            'target-arrow-shape': 'triangle'
+                        }
+                    }
+                ],
+
+                layout: {
+                    name: 'dagre',
+                    // dagre layout options
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "name": "Graffy",
+  "version": "0.1",
+  "manifest_version": 3,
+  "description": "Renders graphs of 'graffy' json data when detected over the wire.",
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "icons": {
+    "128": "images/icon-128.png",
+    "16": "images/icon-16.png"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": ["sidePanel",
+    "scripting", 
+    "<all_urls>",
+    "https://unpkg.com/cytoscape/dist/cytoscape.min.js",
+    "https://unpkg.com/cytoscape-cola/dist/cytoscape-cola.min.js",
+    "https://unpkg.com/cytoscape-cose-bilkent/dist/cytoscape-cose-bilkent.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js",
+    "https://unpkg.com/cytoscape-dagre"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }  
+  ],
+  "web_accessible_resources": [{
+    "resources": ["injected.js"],
+    "matches": ["<all_urls>"]
+  }],
+  "host_permissions": ["<all_urls>"]
+}
