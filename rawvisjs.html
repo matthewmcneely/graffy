@@ -5,6 +5,12 @@
         body {
             background-color: #1b2240;
         }
+
+        pre {
+            color: #807d7d;
+            user-select: none;
+        }
+
         .popup {
             display: none;
             position: fixed;
@@ -24,13 +30,49 @@
             margin: 4px;
             padding: 4px;
             border: 1px solid #888;
+            min-width: 100px;
+            min-height: 80px;
             max-width: 400px;
-            max-height: 400px;
+            max-height: 600px;
             width: auto;
             overflow: auto;
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             border-radius: 10px;
             position: absolute;
+        }
+
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+
+        #leftColumn {
+            width: 30%;
+            overflow: auto;
+        }
+
+        #rightColumn {
+            width: 70%;
+            overflow: auto;
+        }
+
+        #separator {
+            width: 10px;
+            /* Separator width */
+            cursor: ew-resize;
+            /* Cursor indication */
+            background: linear-gradient(to bottom, #5f5f5f, #9e9e9e);
+            /* Gradient effect */
+            border-radius: 5px;
+            /* Rounded corners */
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            /* Shadow for depth */
+            transition: transform 0.2s ease;
+            /* Smooth transition for hover effect */
+        }
+
+        #separator:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         }
     </style>
     <script src="sample-data.js"></script>
@@ -40,41 +82,26 @@
 </head>
 
 <body>
-    <div id="mynetwork"></div>
-    <div id="popup" class="popup">
-        <div class="popup-content">
-            <div id="popup-text">Your dynamic text goes here...</div>
+
+    <div id="container">
+        <div id="leftColumn">
+            <pre id="code"></pre>
         </div>
-    </div>    
+        <div id="separator"></div>
+        <div id="rightColumn">
+            <div id="mynetwork"></div>
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <div id="popup-text">Your dynamic text goes here...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script type="text/javascript" src="lib/vis-network.min.js"></script>
-    <!--
-  Including other packages like Vis Timeline or Vis Graph3D here won't work.
-  You need the peer build to do that.
--->
-
     <script type="text/javascript">
 
-        // create an array with nodes
-        var nodes = new vis.DataSet([
-            { id: 1, label: "Node 1" },
-            { id: 2, label: "Node 2" },
-            { id: 3, label: "Node 3" },
-            { id: 4, label: "Node 4" },
-            { id: 5, label: "Node 5" }
-        ]);
-
-        // create an array with edges
-        var edges = new vis.DataSet([
-            { from: 1, to: 3, label: "inBoundary" },
-            { from: 1, to: 2 },
-            { from: 2, to: 4 },
-            { from: 2, to: 5 },
-            { from: 5, to: 2 },
-            { from: 3, to: 3 }
-        ]);
-
-        // create a network
         var container = document.getElementById("mynetwork");
         var options = {
             edges: {
@@ -103,7 +130,7 @@
                 shape: 'dot'
             },
             physics: {
-                enabled: true            
+                enabled: true
             },
             manipulation: {
                 enabled: false
@@ -113,7 +140,7 @@
         network.on('click', function (properties) {
 
             var ids = properties.nodes;
-            let activeGraph = network["activeGraph"]            
+            let activeGraph = network["activeGraph"]
             var clickedNodes = activeGraph.nodes.get(ids);
             popup = document.getElementById('popup')
             popupContent = document.getElementById('popup-text')
@@ -131,16 +158,52 @@
             }
             popupContent.innerHTML = text;
             var popupBox = document.querySelector('.popup-content');
-            popupBox.style.top =  properties.pointer.DOM.y + 'px';
-            popupBox.style.left = (properties.pointer.DOM.x+30) + 'px';
+            console.log("pointer", properties.pointer)
+            let x = mynetwork.getBoundingClientRect().x
+            let y = mynetwork.getBoundingClientRect().y
+            popupBox.style.top = y + properties.pointer.DOM.y + 'px';
+            popupBox.style.left = x + (properties.pointer.DOM.x + 30) + 'px';
             popup.style.display = 'block';
         });
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == document.getElementById('popup')) {
                 document.getElementById('popup').style.display = 'none';
             }
-        };        
+        };
+
+        const separator = document.getElementById('separator');
+        const leftColumn = document.getElementById('leftColumn');
+        const rightColumn = document.getElementById('rightColumn');
+        let isResizing = false;
+
+        // Add mousedown event listener to the separator
+        separator.addEventListener('mousedown', function (e) {
+            e.preventDefault(); // Prevent default behavior (selection, etc.)
+            isResizing = true;
+        });
+
+        // Add mousemove event listener to the whole document
+        document.addEventListener('mousemove', function (e) {
+            // Only proceed if the separator is being resized
+            if (!isResizing) {
+                return;
+            }
+
+            // Calculate the new width of the left column
+            const containerOffsetLeft = leftColumn.offsetParent.offsetLeft; // Get the container's offset
+            const newLeftWidth = e.clientX - containerOffsetLeft; // New width based on cursor position
+
+            // Update the left column's width
+            // Ensure the width doesn't go beyond container bounds or become negative
+            leftColumn.style.width = Math.max(newLeftWidth, 0) + 'px';
+            // Optionally, you can set bounds to how much the left column can expand or shrink
+        });
+
+        // Add mouseup event listener to stop resizing when the mouse is released
+        document.addEventListener('mouseup', function (e) {
+            isResizing = false;
+        });
 
         setTimeout(function () {
             nodes = {}
@@ -151,6 +214,7 @@
             if (passedData) {
                 data = JSON.parse(atob(passedData));
             }
+            //document.getElementById("code").innerHTML = JSON.stringify(data, null, 2);
             extractDict(nodes, edges, data);
             if (edges.length > 0) {
                 result = convertToVisualizationFormat(nodes, edges);
@@ -162,10 +226,10 @@
                 })
                 network["activeGraph"] = {
                     nodes: nodes,
-                    edges: edges                
+                    edges: edges
                 }
             }
-        }, 1000);
+        }, 100);
 
     </script>
 </body>
