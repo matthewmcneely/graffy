@@ -15,9 +15,23 @@ window.addEventListener('message', function (e) {
             console.log('content script received graphql:', e.data.data);
             chrome.runtime.sendMessage({
                 name: 'graphql-result',
-                data: { value: e.data.data }
+                data: { value: e.data.data },
+                url: e.data.url
               });
             break;
     }
 });
 
+/*
+function sendTabChange() {
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    console.log("SENDING tab change from contentScript.js")
+    chrome.runtime.sendMessage({ name: 'tab-change', color: bgColor, url: window.location.href });
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", sendTabChange);
+} else {
+    sendTabChange();
+}
+*/

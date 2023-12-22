@@ -1,24 +1,41 @@
-const { fetch: origFetch } = window;
-window.fetch = async (...args) => {
-    let inspect = false;
-    if (args[0] == "http://localhost:8080/graphql") {
-        console.log(args)
-        console.log("fetching graphql");
-        inspect = true;
-    }
-    const response = await origFetch(...args);
-    if (!inspect) {
+document.addEventListener('DOMContentLoaded', function() {
+
+    // override fetch
+    const { fetch: origFetch } = window;
+    window.fetch = async (...args) => {
+        const response = await origFetch(...args);
+        // check if the response is a graphql response
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            return response;
+        }
+        const jsonData = await response.clone().json();
+        if (!jsonData.hasOwnProperty("data")) {
+            return response;
+        }
+        url = args[0]
+        if (typeof url === 'object') {
+            url = url.url
+        }
+        window.postMessage({ type: 'graphql', data: jsonData, url: window.location.href}, '*');
         return response;
-    }
-    //console.log('injected script fetch request:', args);
-    response
-        .clone()
-        //.blob() // maybe json(), text(), blob()
-        .json()
-        .then(data => {
-            window.postMessage({ type: 'graphql', data: data }, '*'); // send to content script
-            //window.postMessage({ type: 'fetch', data: URL.createObjectURL(data) }, '*'); // if a big media file, can createObjectURL before send to content script
-        })
-        .catch(err => console.error(err));
-    return response;
-};
+    };
+    
+    // override XMLHttpRequest
+    var originalXHROpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+        this.addEventListener('load', function() {
+            if (this.responseType === '' || this.responseType === 'text') {
+                try {
+                    jsonData = JSON.parse(this.responseText);
+                    if (jsonData.hasOwnProperty("data")) {
+                        window.postMessage({ type: 'graphql', data: jsonData, url: window.location.href }, '*');
+                    }
+                } catch (e) {
+                    return;
+                }
+            }
+        });
+        originalXHROpen.apply(this, arguments);
+    };
+});

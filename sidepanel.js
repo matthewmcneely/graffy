@@ -1,45 +1,79 @@
-// Copyright 2023 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+async function isTabInWindow(targetWindowId) {
+  try {
+    // Get the current tab's window ID
+    const currentWindow = await chrome.windows.getCurrent();
+    const currentWindowId = currentWindow.id;
+    console.log("current window", currentWindowId, "target window", targetWindowId)
+    // Check if the current window ID matches the target window ID
+    return currentWindowId === targetWindowId;
+  } catch (error) {
+    console.error("Error checking window ID:", error);
+    return false; // Assume not in the target window if an error occurs
+  }
+}
 
-console.log('sidepanel.js started');
-
-chrome.runtime.onMessage.addListener(({ name, data }) => {
-  console.log("content script received message", name, data);
+chrome.runtime.onMessage.addListener((msg) => {
+  let name = msg.name;
+  let url = msg.url;
+  console.log("content script received message", msg);
   if (name == "graphql-result") {
-      //document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-      nodes = {}
-      edges = []
-      extractDict(nodes, edges, data);
-      if (edges.length > 0) {
-        console.log("sending cytoscape data", convertToCytoscape(nodes, edges))
-        elements = convertToCytoscape(nodes, edges);
-        cy.elements().remove(); cy.add(elements);
-        cy.layout({
-            name: 'random',
-            fit: true,
-            animate: true,        
-        }).run();  
+    nodes = {}
+    edges = []
+    extractDict(nodes, edges, msg.data.value);
+    if (edges.length > 0) {
+      result = convertToVisualizationFormat(nodes, edges);
+      activeGraph = {
+        nodes: new vis.DataSet(result.nodes),
+        edges: new vis.DataSet(result.edges)
       }
+      network.setData(activeGraph)
+      network["activeGraph"] = activeGraph
+      let url = ""
+      if (msg.url) {
+        url = msg.url
+      }
+      if (!optionsMap[url]) {
+        optionsMap[url] = {}
+      }
+      optionsMap[url]["activeGraph"] = activeGraph
+      document.getElementById('newTab')["activeData"] = msg.data.value
     }
+  }
+  if (name == "tab-change") {
+    console.log(`tab change, url ${url}, windowId ${msg.windowId}`);
+    if (!isTabInWindow(msg.windowId)) {
+      return;
+    }
+    let hostname = new URL(url).hostname
+    let value = optionsMap[hostname]
+    if (!value) {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        hostname = "dark-mode"
+      } else {
+        hostname = "light-mode"
+      }
+      value = optionsMap[hostname]
+    }
+    network.setOptions(optionsMap[hostname].options);
+    document.getElementById('vis').style.backgroundColor = value["body-background-color"];
+    network.setData({})
+    document.getElementById('newTab')["activeData"] = null
+    if (optionsMap[url] && optionsMap[url]["activeGraph"]) {
+      network.setData(optionsMap[url]["activeGraph"]);
+    }
+  }
 });
 
-/*
-window.addEventListener('message', function (e) {
-    switch (e.data.type) {
-        case 'graphql':
-            console.log('content script received graphql:', e.data.data);
-            break;
+document.addEventListener('DOMContentLoaded', function () {
+  console.log("sidepanel.js DOMContentLoaded");
+  document.getElementById('newTab').addEventListener('click', function () {
+    let activeData = document.getElementById('newTab')["activeData"]
+    if (!activeData) {
+      return
     }
+    // encode the data to base64
+    let encodedData = btoa(JSON.stringify(activeData));
+    chrome.windows.create({ url: "file:///Users/matthew/code/graffy/rawvisjs.html"+`?data=${encodedData}` });
+  });
+
 });
-*/

@@ -2,48 +2,64 @@
 <html>
 <head>
     <title>Graffy</title>
-    <script src="lib/cytoscape.min.js"></script>
-    <!--
-    <script src="lib/cytoscape-dagre.min.js"></script>
-    -->    
-    <!-- Load Cytoscape.js -->
-    <!--
-    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-    -->
-    <!-- Load Dagre library -->
-    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script-->
-    <!-- Load Cytoscape Dagre layout extension -->
-    <!--script src="https://unpkg.com/cytoscape-dagre"></script-->
+    <script src="lib/vis-network.min.js"></script>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
+            height: 100%;            
         }
-
-        #cy {
+        #vis {
             width: 100%;
             height: 100%;
+            margin-top: 20px;
             position: absolute;
             top: 0;
             left: 0;
+            background-color: #1b2240;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .popup-content {
+            font-family: Helvetica, sans-serif;
+            font-size: 13px;
+            background-color: rgba(200, 200, 200, 0.8);
+            margin: 4px;
+            padding: 4px;
+            border: 1px solid #888;
+            min-width: 200px;
+            min-height: 300px;
+            max-width: 400px;
+            max-height: 500px;
+            width: auto;
+            overflow: auto;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            border-radius: 10px;
+            position: absolute;
         }
     </style>
 </head>
 <body>
-    <h1>Graffy</h1>
-    <div id="cy"></div>
-    <div>
-      <pre id="result"></pre>
+    <button id="newTab">Click</button>
+    <div id="vis"></div>
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <div id="popup-text">...</div>
+        </div>
     </div>
-
     <script src="convert.js"></script>
     <script src="sidepanel.js"></script>
     <script src="graph.js"></script>
-    <script>
-      console.log("sidepanel.html")
-    </script>    
     <!--script src="test.js"></script-->
 
 </body>

@@ -13,25 +13,39 @@
   "side_panel": {
     "default_path": "sidepanel.html"
   },
-  "permissions": ["sidePanel",
-    "scripting", 
+  "permissions": [
+    "sidePanel",
+    "scripting",
     "<all_urls>",
-    "https://unpkg.com/cytoscape/dist/cytoscape.min.js",
-    "https://unpkg.com/cytoscape-cola/dist/cytoscape-cola.min.js",
-    "https://unpkg.com/cytoscape-cose-bilkent/dist/cytoscape-cose-bilkent.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js",
-    "https://unpkg.com/cytoscape-dagre"],
+    "activeTab",
+    "tabs"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["contentScript.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
       "run_at": "document_start",
-      "all_frames": true
-    }  
+      "all_frames": false
+    }
   ],
-  "web_accessible_resources": [{
-    "resources": ["injected.js"],
-    "matches": ["<all_urls>"]
-  }],
-  "host_permissions": ["<all_urls>"]
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "injected.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ]
 }

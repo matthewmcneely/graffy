@@ -43,17 +43,17 @@ function extractDict(nodes, edges, data, uidAttr = 'id', parent = null, name = n
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
                 const value = data[key];
-                // If the __typename field was not aliased, convert it to 'type'
+                // If the __typename field was not aliased, convert it to 'group'
                 if (key == '__typename') {
-                    updateNode(nodes, data[uidAttr], { type: value });
+                    updateNode(nodes, data[uidAttr], { group: value });
                     delete nodes[data[uidAttr]].__typename;
                 }
                 if (typeof value === 'object' && value !== null && !(value instanceof Array)) {
                     extractDict(nodes, edges, value, uidAttr, data, key);
                 } else if (Array.isArray(value)) {
-                    // In Dgraph DQL results, types are arrays... select the first element as the type
-                    if (key === 'type' && value.length > 0) {
-                        updateNode(nodes, data[uidAttr], { type: value[0] });
+                    // In Dgraph DQL results, types are arrays... select the first element as the group
+                    if (key === 'dgraph.type' && value.length > 0) {
+                        updateNode(nodes, data[uidAttr], { group: value[0] });
                     }
                     // If the __typename field was not aliased, convert it to type
                     // Handle arrays, check if elements are objects (potential nodes)
@@ -68,7 +68,7 @@ function extractDict(nodes, edges, data, uidAttr = 'id', parent = null, name = n
     }
 }
 
-function convertToCytoscape(nodes, edges) {
+function convertToVisualizationFormat(nodes, edges) {
     let result = {nodes: [], edges: []};
     for (const key in nodes) {
         target = {}
@@ -82,10 +82,19 @@ function convertToCytoscape(nodes, edges) {
                 }
             }
         }
-        result["nodes"].push({ data: target });
+        if (!target.hasOwnProperty("label")) {
+            var suspects = ["name", "title", "id"];
+            for (let i = 0; i < suspects.length; i++) {
+                if (source.hasOwnProperty(suspects[i])) {
+                    target["label"] = source[suspects[i]];
+                    break;
+                }
+            }
+        }
+        result["nodes"].push(target);
     }
     for (const edge of edges) {
-        result["edges"].push({ data: { source: edge.src, target: edge.dst, label: edge.type } });
+        result["edges"].push({ from: edge.src, to: edge.dst, label: edge.type });
     }
     return result;
 }
