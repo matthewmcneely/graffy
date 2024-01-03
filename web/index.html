@@ -1,0 +1,357 @@
+<html>
+
+<head>
+    <style>
+        body {
+            background-color: #1b2240;
+        }
+
+        pre {
+            color: #b1afaf;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .popup-content {
+            font-family: Helvetica, sans-serif;
+            font-size: 13px;
+            background-color: rgba(200, 200, 200, 0.8);
+            margin: 4px;
+            padding: 4px;
+            border: 1px solid #888;
+            min-width: 100px;
+            min-height: 100px;
+            max-width: 400px;
+            max-height: 600px;
+            width: auto;
+            overflow: auto;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 10px;
+            position: absolute;
+        }
+
+        #container {
+            display: flex;
+            height: 100vh;
+            display: flex;
+        }
+
+        #separator {
+            cursor: col-resize;
+            background-color: #aaa;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='30'><path d='M2 0 v30 M5 0 v30 M8 0 v30' fill='none' stroke='black'/></svg>");
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 10px;
+            height: 100%;
+
+            /* Prevent the browser's built-in drag from interfering */
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        #left {
+            width: 30%;
+            height: 100%;
+            min-width: 10px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
+        #right {
+            width: 70%;
+            height: 100%;
+            min-width: 200px;
+        }
+
+        #config {
+            display: none;
+            background-color: white;
+            padding: 10px;
+        }
+
+        .loader {
+            display: flex;
+            position: fixed;
+            left: 30%;
+            top: 0px;
+            bottom: 0px;
+            right: 0px;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader img {
+            width: 70px;
+            height: 70px;
+        }
+
+        .help-button {
+            position: absolute;
+            font-family: Arial, Helvetica, sans-serif;
+            z-index: 101;
+            top: 0;
+            right: 0;
+            padding: 0;
+            margin: 0;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .help-button a {
+            text-decoration: none;
+        }
+
+        .config-button {
+            position: absolute;
+            font-family: Arial, Helvetica, sans-serif;
+            z-index: 102;
+            top: 0;
+            right: 30px;
+            padding: 0;
+            margin: 0;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .config-img {
+            padding: 0;
+            margin: 0;
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+    <script src="convert.js"></script>
+    <script src="graph.js"></script>
+</head>
+
+<body>
+    <div id="loader" class="loader">
+        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/ab79a231234507.564a1d23814ef.gif" />
+    </div>
+    <div id="container">
+        <div id="left">
+            <div id="config"></div>
+            <pre id="code"></pre>
+        </div>
+        <div id="separator"></div>
+        <div id="right">
+            <button type="button" class="help-button" title="View the repo (and help)">
+                <a href="https://github.com/matthewmcneely/graffy" target="_blank">?</a>
+            </button>
+            <button type="button" class="config-button" onclick="toggleConfig()" title="Configure graph options">
+                <img class="config-img"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAABBNJREFUaEPtmUeoVVcUhj9LrCSCnWjEQSYGMrD3aIy9IASMiooFHVhRh+pE0RhHCglWgiKCFQNBBHsZqKigoNhREzSgRNSYiMa6f9gXrsdzzl7ncu57Pnl79C5n7X+vf6+1V3s1qOKrRhXXn2oClW3Bagt8jBb4BFgH/AA09AT/B/YDk4AHeZIuhwvNBH5JUHINMONDJ/ArMCVByTNAl8omIKv1AOoBx4CXEYU2AxMSlDwHdIj5JlKNgOPA8ywEs7pQA2AHMMwfctr//bf/XRM4D3ydoMQT4HPgX/9d70WEx/jfF4AhwF0riSwE9CD3AH0j4FeAWcA9YF6K+xS27QMW+B8/AQMieNedJfoBdywkrAR0s4oi31lAc5ARiU7APyEsKwEpfjAElvP3OcDPIcwPmYDccVVeBORCh2L8P4Rf6vfbQHvgUQjAagHhfAocATqGQAFFGxGWIq+A1v79NDXs/Qvo6fcGxbMQEFh34EQKqm5sMaCMG43ntYCxLn8o8rRKwVAS3BjU3AtkJdDO1TiXEsBv+Rh+NXB4C5fMfk/JyN8Dv5WDQG1gEzAuBlwu0xW4bDy4uUuAKivaxMjLwoO9Gwbh0iygxDUf6AbUAb50BNomICoxLQ+e9q6AqtXtCXvuA8rKKlOU2eV2sQ86jcA2d6OjDUqpVG5mSToRLJ39B/CF4YxdwKg4uTQCT4H6BnBFJqX+UtZ6V/dMM2x8CDTOSuCNAVgiihhJ5XMIQq63LCQE6DILzdE74mkWsBLQw55sUCJOZCGw1LC3JAJWFzrq+oJvDUrEiWxwVedUw96SXGhrUZ2edoYescLiY4MixSKy/p8+S4e27vQ99ntyaS6k5kUFlbqvUBiVK/wY0iLyXRFOkS5uqbe4WBRGFaJjLyhLJg4lMuWLpCwdVVIWO5sQQtWmquP7z3IhWQgIL1RKDHVupw4tbbX0pUTnBKERvvOz6J95Nhoq5mTmJe5NrAaeRTRQMTfeu5r64qSlgcAWk/aucsxigc+Aw8ZyWk27ZG8Cr72rKNk1MSimh61yOteeWLen+r6PQYE8RG74i8qtJ+7vbuVAHpplwNAET31F6rK6kMwvC1Tkmg6sDR1oJaCeWPMcWaIilpoijVUKA7DEM60EBKBiaq97nN9E0BT7Z7vhlqZz6h8mBhjqIha5Gkh5ZUUM3jVf3Zqmc1kIFEjsdn3xQK/kKZeQhheNzGUpNSJfJZBQmFU/XEhSdX1TM9LLK/sOAtTYm1ZWAgLVnt7+BjWMjQ5302ooZd+4BNbLW1iFYVmHu5ZbSZtOn/S1lQXHJFOKBULAc92ofGWCkP7xofeS2yoHAVWuahXVw6qi1Xrho1iV+BdTbrdrASqHBSzn5iZTTSC3qywRqNoCJV5cbtveAp4OrDHvZALXAAAAAElFTkSuQmCC" />
+            </button>
+            <div id="mynetwork"></div>
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <div id="popup-text">Your dynamic text goes here...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script type="text/javascript">
+
+        var container = document.getElementById("mynetwork");
+        var options = {
+            edges: {
+                arrows: {
+                    to: {
+                        enabled: true,
+                        scaleFactor: 0.6,
+                        type: 'arrow'
+                    }
+                },
+                font: {
+                    color: 'white',
+                    strokeWidth: 0,
+                    size: 11
+                }
+            },
+            nodes: {
+                color: '#2070cb',
+                fixed: false,
+                size: 20,
+                font: '12px Helvetica white',
+                scaling: {
+                    label: false
+                },
+                shadow: true,
+                shape: 'dot'
+            },
+            manipulation: {
+                enabled: false
+            },
+            physics: {
+                enabled: true,
+                adaptiveTimestep: true,
+                barnesHut: {
+                    gravitationalConstant: -8000,
+                    springConstant: 0.04
+                },
+                stabilization: {
+                    iterations: 1000
+                }
+            },
+            layout: {
+                randomSeed: 42,
+                improvedLayout: false
+            },
+            configure: {
+                filter: ['nodes', 'edges', 'physics', 'renderer', 'layout', 'interaction'],
+                showButton: false,
+                container: document.getElementById('config')
+            },
+        }
+        var network = new vis.Network(container, {}, options);
+        network.on('click', function (properties) {
+
+            var ids = properties.nodes;
+            let activeGraph = network["activeGraph"]
+            var clickedNodes = activeGraph.nodes.get(ids);
+            popup = document.getElementById('popup')
+            popupContent = document.getElementById('popup-text')
+            if (clickedNodes.length != 1) {
+                popup.style.display = 'none';
+                return
+            }
+            clickedNode = clickedNodes[0]
+            var text = ""
+            for (const key in clickedNode) {
+                if (clickedNode.hasOwnProperty(key)) {
+                    const element = clickedNode[key];
+                    text += `<span><b>${key}:</b> ${element}</span><br>`
+                }
+            }
+            popupContent.innerHTML = text;
+            var popupBox = document.querySelector('.popup-content');
+            let x = mynetwork.getBoundingClientRect().x
+            let y = mynetwork.getBoundingClientRect().y
+            popupBox.style.top = y + properties.pointer.DOM.y + 'px';
+            popupBox.style.left = x + (properties.pointer.DOM.x + 30) + 'px';
+            popup.style.display = 'block';
+        });
+        network.on("stabilizationIterationsDone", function () {
+            document.getElementById("loader").style.display = "none";
+        });
+
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('popup')) {
+                document.getElementById('popup').style.display = 'none';
+            }
+        };
+
+        function toggleConfig() {
+            var config = document.getElementById("config");
+            if (config.style.display === "none" || config.style.display === "") {
+                config.style.display = "block";
+            } else {
+                config.style.display = "none";
+            }
+        }
+
+        // A function is used for dragging and moving
+        function dragElement(element, direction) {
+            var md; // remember mouse down info
+            const first = document.getElementById("left");
+            const second = document.getElementById("right");
+
+            element.onmousedown = onMouseDown;
+
+            function onMouseDown(e) {
+                //console.log("mouse down: " + e.clientX);
+                md = {
+                    e,
+                    offsetLeft: element.offsetLeft,
+                    offsetTop: element.offsetTop,
+                    firstWidth: first.offsetWidth,
+                    secondWidth: second.offsetWidth
+                };
+
+                document.onmousemove = onMouseMove;
+                document.onmouseup = () => {
+                    //console.log("mouse up");
+                    document.onmousemove = document.onmouseup = null;
+                }
+            }
+
+            function onMouseMove(e) {
+                //console.log("mouse move: " + e.clientX);
+                var delta = {
+                    x: e.clientX - md.e.clientX,
+                    y: e.clientY - md.e.clientY
+                };
+
+                if (direction === "H") // Horizontal
+                {
+                    // Prevent negative-sized elements
+                    delta.x = Math.min(Math.max(delta.x, -md.firstWidth),
+                        md.secondWidth);
+
+                    element.style.left = md.offsetLeft + delta.x + "px";
+                    first.style.width = (md.firstWidth + delta.x) + "px";
+                    second.style.width = (md.secondWidth - delta.x) + "px";
+                }
+            }
+        }
+
+
+        dragElement(document.getElementById("separator"), "H");
+
+        setTimeout(function () {
+            nodes = {}
+            edges = []
+            var params = new URLSearchParams(window.location.search);
+            var passedData = params.get('data');
+            var data = {}
+            if (passedData) {
+                document.getElementById('loader').style.display = 'flex';
+                let decodedData = urlSafeToBase64(passedData)
+                //data = JSON.parse(atob(passedData));
+                decodeAndDecompressBase64(decodedData).then((result) => {
+                    data = result
+                    document.getElementById("code").innerHTML = JSON.stringify(data, null, 2);
+                    extractDict(nodes, edges, data);
+                    if (edges.length > 0) {
+                        result = convertToVisualizationFormat(nodes, edges);
+                        nodes = new vis.DataSet(result.nodes)
+                        if (nodes.length > 300) {
+                            network.physics.options.barnesHut.gravitationalConstant = -20000
+                            network.physics.options.barnesHut.springConstant = 0.02
+                            network.physics.options.barnesHut.springLength = 80
+                        }
+                        edges = new vis.DataSet(result.edges)
+                        network.setData({
+                            nodes: nodes,
+                            edges: edges
+                        })
+                        network["activeGraph"] = {
+                            nodes: nodes,
+                            edges: edges
+                        }
+                    }
+                });
+            }
+        }, 100);
+
+    </script>
+</body>
+
+</html>
