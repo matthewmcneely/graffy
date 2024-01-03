@@ -55,7 +55,6 @@ function extractDict(nodes, edges, data, uidAttr = 'id', parent = null, name = n
                     if (key === 'dgraph.type' && value.length > 0) {
                         updateNode(nodes, data[uidAttr], { group: value[0] });
                     }
-                    // If the __typename field was not aliased, convert it to type
                     // Handle arrays, check if elements are objects (potential nodes)
                     value.forEach(element => {
                         if (element && typeof element === 'object' && element.hasOwnProperty(uidAttr)) {
@@ -74,7 +73,6 @@ function convertToVisualizationFormat(nodes, edges) {
         target = {}
         source = nodes[key];
         for (let key in source) {
-            // Check if the property is part of the source object itself, not its prototype
             if (source.hasOwnProperty(key)) {
                 // Check if the property is not an array and not an object
                 if (!Array.isArray(source[key]) && typeof source[key] !== 'object') {
@@ -82,6 +80,7 @@ function convertToVisualizationFormat(nodes, edges) {
                 }
             }
         }
+        // find a label for the node
         if (!target.hasOwnProperty("label")) {
             var suspects = ["name", "title", "id"];
             for (let i = 0; i < suspects.length; i++) {
@@ -99,4 +98,46 @@ function convertToVisualizationFormat(nodes, edges) {
     return result;
 }
 
-//module.exports = { extractDict };
+async function compressAndEncodeBase64(jsonObject) {
+    // Serialize the JSON Object
+    const jsonString = JSON.stringify(jsonObject);
+
+    // Convert the String to Uint8Array
+    const encoder = new TextEncoder();
+    const inputUint8Array = encoder.encode(jsonString);
+
+    // Convert the Uint8Array to a readable stream
+    const inputStream = new ReadableStream({
+        start(controller) {
+            controller.enqueue(inputUint8Array);
+            controller.close();
+        },
+    });
+
+    // Compress the Data
+    const compressedStream = new CompressionStream('gzip');
+    const compressed = inputStream.pipeThrough(compressedStream);
+
+    // Collect chunks from the compression stream
+    const chunks = [];
+    const reader = compressed.getReader();
+    let chunk;
+    while ((chunk = await reader.read()) && !chunk.done) {
+        chunks.push(chunk.value);
+    }
+
+    // Convert the chunks to a single Uint8Array
+    const compressedUint8Array = new Uint8Array(chunks.reduce((acc, val) => acc.concat(Array.from(val)), []));
+
+    // Convert Compressed Data to Base64
+    const arrayBuffer = compressedUint8Array.buffer;
+    const base64String = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
+    // Return the base64 encoded compressed string
+    return base64String;
+}
+
+function base64ToUrlSafe(base64Str) {
+    // Replace '+' with '-', '/' with '_', and Remove trailing '='
+    return base64Str.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}

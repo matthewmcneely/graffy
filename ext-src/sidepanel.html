@@ -13,7 +13,7 @@
             height: 100%;
         }
 
-        button {
+        .popout-button {
             position: absolute;
             font-family: Arial, Helvetica, sans-serif;
             z-index: 100;
@@ -21,8 +21,26 @@
             right: 0;
             padding: 0;
             margin: 0;
-            width:  24px;
+            width: 24px;
             height: 24px;
+            cursor: pointer;
+        }
+
+        .help-button {
+            position: absolute;
+            font-family: Arial, Helvetica, sans-serif;
+            z-index: 101;
+            top: 0;
+            left: 0;
+            padding: 0;
+            margin: 0;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .help-button a {
+            text-decoration: none;
         }
 
         #container {
@@ -59,7 +77,7 @@
             padding: 4px;
             border: 1px solid #888;
             min-width: 100px;
-            min-height: 200px;
+            min-height: 100px;
             max-width: 400px;
             max-height: 500px;
             width: auto;
@@ -68,15 +86,36 @@
             border-radius: 10px;
             position: absolute;
         }
+
+        .loader {
+            display: none;
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            bottom: 0px;
+            right: 0px;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader img {
+            width: 70px;
+            height: 70px;
+        }
+
     </style>
 </head>
 
 <body>
     <div id="container">
-        <button type="button" id="newTab">
-            <!--
-            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 13.5v6H5v-12h6m3-3h6v6m0-6-9 9" class="icon_svg-stroke" stroke="#666" stroke-width="1.5" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-            -->
+        <div id="loader" class="loader">
+            <img src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/ab79a231234507.564a1d23814ef.gif" />
+        </div>
+        <button type="button" class="help-button" title="View the graffy repo (and help)">
+            <a href="https://github.com/matthewmcneely/graffy" target="_blank">?</a>
+        </button>
+        <button type="button" class="popout-button" id="newTab" title="Pop-out this graph into a new window">
             &#8599;
         </button>
         <div id="vis"></div>
@@ -89,8 +128,6 @@
     <script src="convert.js"></script>
     <script src="sidepanel.js"></script>
     <script src="graph.js"></script>
-    <!--script src="test.js"></script-->
-
 </body>
 
 </html>

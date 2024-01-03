@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return response;
     };
     
-    // override XMLHttpRequest
+    // override XHR
     var originalXHROpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function(method, url) {
         this.addEventListener('load', function() {

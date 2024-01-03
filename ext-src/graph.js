@@ -31,7 +31,19 @@ var options = {
         shape: 'dot'
     },
     physics: {
-        enabled: true
+        enabled: true,
+        adaptiveTimestep: true,
+        barnesHut: {
+            gravitationalConstant: -8000,
+            springConstant: 0.04                    
+        },
+        stabilization: {
+            iterations: 1000
+        }
+    },
+    layout: {
+        randomSeed: 42,
+        improvedLayout: false
     }
 }
 
@@ -57,7 +69,7 @@ var optionsMap = {
         options: JSON.parse(JSON.stringify(options))
     },
     "light-mode": {
-        "body-background-color": "#FAFAFA",
+        "body-background-color": "#fafafa",
         "node-color": "#2070cb",
         "text-color": "black",
         options: JSON.parse(JSON.stringify(options))
@@ -66,7 +78,7 @@ var optionsMap = {
 
 var network = null
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     for (var key in optionsMap) {
         let value = optionsMap[key]
         value.options.nodes.color = value["node-color"]
@@ -101,17 +113,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             popupContent.innerHTML = text;
             var popupBox = document.querySelector('.popup-content');
-            popupBox.style.top =  properties.pointer.DOM.y + 'px';
-            popupBox.style.left = (properties.pointer.DOM.x+30) + 'px';
+            popupBox.style.top = properties.pointer.DOM.y + 'px';
+            popupBox.style.left = (properties.pointer.DOM.x + 30) + 'px';
             popup.style.display = 'block';
         });
+        network.on("stabilizationIterationsDone", function () {
+            document.getElementById("loader").style.display = "none";
+        });
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == document.getElementById('popup')) {
                 document.getElementById('popup').style.display = 'none';
             }
-        };        
+        };
 
     }
 });
-  
+
