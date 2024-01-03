@@ -2,6 +2,8 @@
 
 Graffy is a Chrome "side panel" extension that listens for GraphQL results on visited websites. When found, that data is transformed into a "network" graph using [vis.js](https://visjs.org). Originally designed as the missing graph visualization tool for Apollo Studio, Graffy can reveal interesting networks returned by all sorts of sites that use GraphQL.
 
+![Alt text](imgs/extension.png?raw=true "Title")
+
 ### Requirements
 
 In order for Graffy to render visualizations, several Graph-y (graffy) conditions must be satisfied:
@@ -39,6 +41,8 @@ If the GraphQL constant `__typename` or `type` attribute is present, nodes will 
 If the rendered network graph is too small, clicking the small button in the upper right hand corner (&#8599;) will open a new (presumably) larger browser window in which the GraphQL result as well as the network graph can be viewed. In this pop-out, you can adjust the graph physics and other options by click the gear icon.
 
 The URL in which the pop-out network graph renders is self-contained and can be shared as a link with collaborators.
+
+![Alt text](imgs/popout.png?raw=true "Title")
 
 ### Issues
 
