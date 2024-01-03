@@ -35,7 +35,7 @@ var options = {
         adaptiveTimestep: true,
         barnesHut: {
             gravitationalConstant: -8000,
-            springConstant: 0.04                    
+            springConstant: 0.04
         },
         stabilization: {
             iterations: 1000
@@ -43,7 +43,7 @@ var options = {
     },
     layout: {
         randomSeed: 42,
-        improvedLayout: false
+        improvedLayout: true,
     }
 }
 
