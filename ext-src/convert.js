@@ -90,6 +90,9 @@ function convertToVisualizationFormat(nodes, edges) {
                 }
             }
         }
+        if (target["label"].length > 14) {
+            target["label"] = target["label"].substring(0, 14) + "...";
+        }
         result["nodes"].push(target);
     }
     for (const edge of edges) {
