@@ -34,7 +34,7 @@ chrome.runtime.onMessage.addListener((msg) => {
       } else {
         network.physics.options.barnesHut.gravitationalConstant = -800
         network.physics.options.barnesHut.springConstant = 0.04
-        network.physics.options.barnesHut.springLength = 60
+        network.physics.options.barnesHut.springLength = 95
       }
       network.setData(activeGraph)
       network["activeGraph"] = activeGraph
