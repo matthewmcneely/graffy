@@ -49,3 +49,23 @@ The URL in which the pop-out network graph renders is self-contained and can be 
 Due to the nature of Chrome Side Panel extensions, network graphs rendered in a side panel in one open window at a particular URL will overwrite the rendered graph in another window opened at the same URL. Workaround: simply issue the query again.
 
 Graphs with a large number of nodes can take several seconds to render and if highly-connected can take ages to stabilize. Workaround: open the pop-out and adjust the rendering configuration options.
+
+### Privacy
+
+Data that Graffy intercepts DOES NOT leave your machine.
+
+### Installation
+
+I'm still navigating the Chrome extension store process... to install this beta version:
+
+1. Clone (or download) this repo
+2. In your Chrome browser, turn on "Developer Mode" after opening the Extensions window (Window->Extensions)
+3. Select "Load Unpacked"
+4. Choose the `ext-src` folder in the cloned/downloaded repo folder
+5. Open your Chrome side panel by selecting the side panel icon: ![side panel icon](imgs/sidepanel-icon.png)
+6. Select `graffy`
+
+
+### Contributing and Feedback
+
+Feel free to submit pull requests and report bugs through [Issues](https://github.com/matthewmcneely/graffy/issues).
