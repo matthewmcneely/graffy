@@ -16,7 +16,6 @@
   "permissions": [
     "sidePanel",
     "scripting",
-    "<all_urls>",
     "activeTab",
     "tabs"
   ],

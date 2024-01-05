@@ -50,11 +50,15 @@ chrome.runtime.onMessage.addListener((msg) => {
     }
   }
   if (name == "tab-change") {
-    //console.log(`tab change, url ${url}, windowId ${msg.windowId}`);
     if (!isTabInWindow(msg.windowId)) {
       return;
     }
-    let hostname = new URL(url).hostname
+    let hostname = ""
+    try {
+      hostname = new URL(url).hostname
+    } catch (e) {
+      return
+    }
     let value = optionsMap[hostname]
     if (!value) {
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {

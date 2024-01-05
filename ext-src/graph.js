@@ -43,7 +43,7 @@ var options = {
     },
     layout: {
         randomSeed: 42,
-        improvedLayout: true,
+        improvedLayout: false
     }
 }
 
