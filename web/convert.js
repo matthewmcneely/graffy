@@ -81,7 +81,7 @@ function convertToVisualizationFormat(nodes, edges) {
             }
         }
         // find a label for the node
-        if (!target.hasOwnProperty("label")) {
+        if (!target.hasOwnProperty("label") || target["label"] === null) {
             var suspects = ["name", "title", "id"];
             for (let i = 0; i < suspects.length; i++) {
                 if (source.hasOwnProperty(suspects[i])) {
@@ -89,6 +89,9 @@ function convertToVisualizationFormat(nodes, edges) {
                     break;
                 }
             }
+        }
+        if (target["label"] == null) {
+            continue
         }
         if (target["label"].length > 14) {
             target["label"] = target["label"].substring(0, 14) + "...";
