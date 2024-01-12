@@ -15,8 +15,6 @@
   },
   "permissions": [
     "sidePanel",
-    "scripting",
-    "activeTab",
     "tabs"
   ],
   "content_security_policy": {
