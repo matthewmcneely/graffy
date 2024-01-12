@@ -8,7 +8,7 @@ Graffy is a Chrome "side panel" extension that listens for GraphQL results on vi
 
 In order for Graffy to render visualizations, several Graph-y (graffy) conditions must be satisfied:
 
-1. The JSON result must have the `data` attribute (a GraphQL standard)
+1. The JSON result must have the `data` attribute (a GraphQL standard, but it's worth noting here that any "graph-y" JSON data that is found in JSON results with the key `data`, will be rendered into a visualization)
 1. Nodes in the graph must have an identifier labelled `id`
 1. Connected nodes (in arrays) must be immediate children of the parent node (i.e., Graffy won't connect edges that are in intermediate nodes below a parent)
 1. At least two nodes have to be connected (one edge) in order for Graffy to render
@@ -52,11 +52,13 @@ Graphs with a large number of nodes can take several seconds to render and if hi
 
 ### Privacy
 
-Data that Graffy intercepts DOES NOT leave your machine.
+Data that Graffy intercepts DOES NOT leave your machine. The exception to this is if you pop-out the graph to a new window. In this case, your JSON data is sent to a rendering server and is logged. Logs are not shared with third-parties. Logs are purged every 30 days.
 
 ### Installation
 
-I'm still navigating the Chrome extension store process... to install this beta version:
+Available at the Chrome Web Store via https://chromewebstore.google.com/detail/graffy/hpbbfdcfeinlpdhhjanfhkadiccofeif
+
+### Contributing and Feedback
 
 1. Clone (or download) this repo
 2. In your Chrome browser, turn on "Developer Mode" after opening the Extensions window (Window->Extensions)
@@ -64,8 +66,5 @@ I'm still navigating the Chrome extension store process... to install this beta 
 4. Choose the `ext-src` folder in the cloned/downloaded repo folder
 5. Open your Chrome side panel by selecting the side panel icon: ![side panel icon](imgs/sidepanel-icon.png)
 6. Select `graffy`
-
-
-### Contributing and Feedback
 
 Feel free to submit pull requests and report bugs through [Issues](https://github.com/matthewmcneely/graffy/issues).
