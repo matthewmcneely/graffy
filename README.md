@@ -54,6 +54,8 @@ Graphs with a large number of nodes can take several seconds to render and if hi
 
 Data that Graffy intercepts DOES NOT leave your machine. The exception to this is if you pop-out the graph to a new window. In this case, your JSON data is sent to a rendering server and is logged. Logs are not shared with third-parties. Logs are purged every 30 days.
 
+Full details of the Privacy Policy are [here](privacy-policy.txt).
+
 ### Installation
 
 Available at the Chrome Web Store via https://chromewebstore.google.com/detail/graffy/hpbbfdcfeinlpdhhjanfhkadiccofeif
