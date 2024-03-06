@@ -1,6 +1,6 @@
 {
   "name": "Graffy",
-  "version": "0.2",
+  "version": "0.3",
   "manifest_version": 3,
   "description": "Renders graphs of 'graffy' json data when detected over the wire.",
   "background": {
