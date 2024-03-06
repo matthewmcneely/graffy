@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return response;
         }
         const jsonData = await response.clone().json();
+        if (jsonData == null) {
+            return response;
+        }
         if (!jsonData.hasOwnProperty("data")) {
             return response;
         }
@@ -28,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.responseType === '' || this.responseType === 'text') {
                 try {
                     jsonData = JSON.parse(this.responseText);
+                    if (jsonData == null) {
+                        return;
+                    }
                     if (jsonData.hasOwnProperty("data")) {
                         window.postMessage({ type: 'graphql', data: jsonData, url: window.location.href }, '*');
                     }
